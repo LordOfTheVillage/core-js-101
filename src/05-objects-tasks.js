@@ -1,3 +1,7 @@
+/* eslint-disable comma-dangle */
+/* eslint-disable operator-linebreak */
+/* eslint-disable prefer-template */
+/* eslint-disable no-underscore-dangle */
 /* ************************************************************************************************
  *                                                                                                *
  * Please read the following tutorial before implementing tasks:                                   *
@@ -115,32 +119,124 @@ function fromJSON(proto, json) {
  */
 
 const cssSelectorBuilder = {
-  element(/* value */) {
-    throw new Error('Not implemented');
+  _build: '',
+  _element: '',
+  _id: '',
+  _class: '',
+  _attribute: '',
+  _pseudoClass: '',
+  _pseudoElement: '',
+  _order: -1,
+
+  element(value) {
+    const object = Object.create(this);
+    if (object._element !== '') object.throwError(0);
+    if (object._order > 0) object.throwError(1);
+    object._order = 0;
+    object._element = value;
+    return object;
   },
 
-  id(/* value */) {
-    throw new Error('Not implemented');
+  id(value) {
+    const object = Object.create(this);
+    if (object._id !== '') object.throwError(0);
+    if (object._order > 1) object.throwError(1);
+    object._order = 1;
+    object._id = value;
+    return object;
   },
 
-  class(/* value */) {
-    throw new Error('Not implemented');
+  class(value) {
+    const object = Object.create(this);
+    if (object._order > 2) object.throwError(1);
+    object._order = 2;
+    if (object._class !== '') object._class += `.${value}`;
+    else object._class += value;
+    return object;
   },
 
-  attr(/* value */) {
-    throw new Error('Not implemented');
+  attr(value) {
+    const object = Object.create(this);
+    if (object._order > 3) object.throwError(1);
+    object._order = 3;
+    object._attribute = value;
+    return object;
   },
 
-  pseudoClass(/* value */) {
-    throw new Error('Not implemented');
+  pseudoClass(value) {
+    const object = Object.create(this);
+    if (object._order > 4) object.throwError(1);
+    object._order = 4;
+    if (object._pseudoClass !== '') object._pseudoClass += `:${value}`;
+    else object._pseudoClass += value;
+    return object;
   },
 
-  pseudoElement(/* value */) {
-    throw new Error('Not implemented');
+  pseudoElement(value) {
+    const object = Object.create(this);
+    if (object._pseudoElement !== '') object.throwError(0);
+    if (object._order > 5) object.throwError(1);
+    object._order = 5;
+    if (object._pseudoElement !== '') object._pseudoElement += `::${value}`;
+    else object._pseudoElement += value;
+    return object;
   },
 
-  combine(/* selector1, combinator, selector2 */) {
-    throw new Error('Not implemented');
+  combine(selector1, combinator, selector2) {
+    const object = Object.create(this);
+    const s1 = selector1.stringify();
+    const s2 = selector2.stringify();
+    object._build = s1 + ' ' + combinator + ' ' + s2;
+    return object;
+  },
+
+  _clear() {
+    const object = Object.create(this);
+    object._build = '';
+    object._element = '';
+    object._id = '';
+    object._class = '';
+    object._attribute = '';
+    object._pseudoClass = '';
+    object._pseudoElement = '';
+    object._order = -1;
+    return object;
+  },
+
+  // checkOrder(index, array) {
+  //   return array.every((e, i) => i <= index || e === 0);
+  // },
+
+  throwError(code) {
+    if (code === 0) {
+      throw new Error(
+        'Element, id and pseudo-element should not occur more then one time inside the selector'
+      );
+    }
+    if (code === 1) {
+      throw new Error(
+        'Selector parts should be arranged in the following order: element, id, class, attribute, pseudo-class, pseudo-element'
+      );
+    }
+  },
+
+  stringify() {
+    let result = '';
+
+    if (this._build !== '') {
+      result += this._build;
+      this._clear();
+      return result;
+    }
+
+    if (this._element !== '') result += this._element;
+    if (this._id !== '') result += `#${this._id}`;
+    if (this._class !== '') result += `.${this._class}`;
+    if (this._attribute !== '') result += `[${this._attribute}]`;
+    if (this._pseudoClass !== '') result += `:${this._pseudoClass}`;
+    if (this._pseudoElement !== '') result += `::${this._pseudoElement}`;
+    this._clear();
+    return result;
   },
 };
 
