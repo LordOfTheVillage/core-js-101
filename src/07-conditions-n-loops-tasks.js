@@ -1,3 +1,5 @@
+/* eslint-disable spaced-comment */
+/* eslint-disable eqeqeq */
 /* eslint-disable no-confusing-arrow */
 /* eslint-disable comma-dangle */
 /* eslint-disable function-paren-newline */
@@ -166,8 +168,10 @@ function doRectanglesOverlap(rect1, rect2) {
  *   { center: { x:0, y:0 }, radius:10 },  { x:10, y:10 }   => false
  *
  */
-function isInsideCircle(/* circle, point */) {
-  throw new Error('Not implemented');
+function isInsideCircle(circle, point) {
+  const { x, y } = circle.center;
+  const r = circle.radius;
+  return (point.x - x) ** 2 + (point.y - y) ** 2 < r ** 2;
 }
 
 /**
@@ -332,23 +336,24 @@ function getDigitalRoot(num) {
  *   '{)' = false
  *   '{[(<{[]}>)]}' = true
  */
-function isBracketsBalanced(/* str */) {
-  throw new Error('Not implemented');
-  // const balance = {
-  //   '[]': 0,
-  //   '{}': 0,
-  //   '()': 0,
-  //   '<>': 0,
-  // };
-  // for (let i = 0; i < str.length; i++) {
-  //   for (const key in balance) {
-  //     if (str[i] === key[1] && balance[key] === 0) return false;
-  //     if (str[i] === key[1] && ) return false;
-  //     if (str[i] === key[0]) balance[key]++;
-  //     if (str[i] === key[1]) balance[key]--;
-  //   }
-  // }
-  // return Object.keys(balance).every((k) => balance[k] === 0);
+function isBracketsBalanced(str) {
+  const brackets = ['[]', '()', '{}', '<>'];
+  const stack = [];
+  let last;
+
+  for (let i = 0; i < str.length; i++) {
+    if (brackets.some((b) => b[0] === str[i])) {
+      stack.push(str[i]);
+    } else if (brackets.some((b) => b[1] === str[i])) {
+      if (stack.length) {
+        last = stack[stack.length - 1];
+        if (brackets.some((b) => last === b[0] && b[1] === str[i])) {
+          stack.pop();
+        }
+      } else return false;
+    }
+  }
+  return !stack.length;
 }
 
 /**
